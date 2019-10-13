@@ -16,11 +16,10 @@ import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
-import javax.validation.constraints.NotNull;
+
 
 import javax.validation.constraints.Email;
-import javax.validation.constraints.NotEmpty;
-import org.springframework.format.annotation.DateTimeFormat;
+
 
 @Entity
 @Table(name = "clientes")
@@ -32,20 +31,19 @@ public class Cliente implements Serializable {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 
-	@NotEmpty
+
 	private String nombre;
 	
-	@NotEmpty
+
 	private String apellido;
 	
-	@NotEmpty
+	
 	@Email
 	private String email;
 
-	@NotNull
+	
 	@Column(name = "create_at")
 	@Temporal(TemporalType.DATE)
-	@DateTimeFormat(pattern="yyyy-MM-dd")
 	private Date createAt;
 	
 	@OneToMany(mappedBy = "cliente", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
@@ -54,8 +52,6 @@ public class Cliente implements Serializable {
 	public Cliente() {
 		facturas = new ArrayList<Factura>();
 	}
-
-	private String foto;
 	
 	public Long getId() {
 		return id;
@@ -95,14 +91,6 @@ public class Cliente implements Serializable {
 
 	public void setCreateAt(Date createAt) {
 		this.createAt = createAt;
-	}
-
-	public String getFoto() {
-		return foto;
-	}
-
-	public void setFoto(String foto) {
-		this.foto = foto;
 	}
 
 	public List<Factura> getFacturas() {

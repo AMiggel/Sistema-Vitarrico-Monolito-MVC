@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -26,7 +27,9 @@ import com.vitarrico.springboot.app.models.entity.Factura;
 import com.vitarrico.springboot.app.models.entity.ItemFactura;
 import com.vitarrico.springboot.app.models.entity.Producto;
 import com.vitarrico.springboot.app.models.service.IClienteService;
+import com.vitarrico.springboot.app.models.service.productos.ServicioProducto;
 
+@CrossOrigin(origins = "http://localhost:4200")
 @Controller
 @RequestMapping("/factura")
 @SessionAttributes("factura")
@@ -34,6 +37,9 @@ public class FacturaController {
 
 	@Autowired
 	private IClienteService clienteService;
+
+	@Autowired
+	private ServicioProducto servicioProducto;
 
 	private final Logger log = LoggerFactory.getLogger(getClass());
 
@@ -90,7 +96,7 @@ public class FacturaController {
 
 		if (itemId == null || itemId.length == 0) {
 			model.addAttribute("titulo", "Crear Factura");
-			model.addAttribute("error", "Error: La factura NO puede no tener líneas!");
+			model.addAttribute("error", "Error: La factura debe tener al menos un producto!");
 			return "factura/form";
 		}
 
@@ -99,9 +105,22 @@ public class FacturaController {
 
 			ItemFactura linea = new ItemFactura();
 			linea.setCantidad(cantidad[i]);
+
+			if (linea.getCantidad() > producto.getCantidadDisponible()) {
+				model.addAttribute("titulo", "Crear Factura");
+				model.addAttribute("error", "No hay productos suficientes para " + producto.getNombre()
+						+ " cantidad disponible " + producto.getCantidadDisponible());
+				return "factura/form";
+			}
 			linea.setProducto(producto);
 			factura.addItemFactura(linea);
-
+			Integer restarCantidad = producto.getCantidadDisponible() - linea.getCantidad();
+			if (restarCantidad == 0) {
+				producto.setCantidadDisponible(0);
+			} else {
+				producto.setCantidadDisponible(restarCantidad);
+			}
+			servicioProducto.modificarCantidadDisponible(producto.getId(), producto);
 			log.info("ID: " + itemId[i].toString() + ", cantidad: " + cantidad[i].toString());
 		}
 

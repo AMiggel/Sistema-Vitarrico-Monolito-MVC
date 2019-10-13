@@ -8,7 +8,6 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.PrePersist;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
@@ -16,6 +15,11 @@ import javax.persistence.TemporalType;
 @Entity
 @Table(name = "productos")
 public class Producto implements Serializable {
+
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -26,46 +30,85 @@ public class Producto implements Serializable {
 	private Double precio;
 
 	@Temporal(TemporalType.DATE)
-	@Column(name = "create_at")
-	private Date createAt;
+	@Column(name = "fecha_creacion")
+	private Date fechaCreacion;
 
-	@PrePersist
-	public void prePersist() {
-		createAt = new Date();
-	}
+	@Temporal(TemporalType.DATE)
+	@Column(name = "fecha_vencimiento")
+	private Date fechaVencimiento;
+
+	@Column(name = "tipo_producto")
+	private String tipoProducto;
+
+	@Column(name = "cantidad_disponible")
+	private int cantidadDisponible;
+
+	@Column(name = "cantidad_creada")
+	private int cantidadCreada;
 
 	public Long getId() {
 		return id;
-	}
-
-	public void setId(Long id) {
-		this.id = id;
 	}
 
 	public String getNombre() {
 		return nombre;
 	}
 
-	public void setNombre(String nombre) {
-		this.nombre = nombre;
-	}
-
 	public Double getPrecio() {
 		return precio;
+	}
+
+	public Date getFechaCreacion() {
+		return fechaCreacion;
+	}
+
+	public Date getFechaVencimiento() {
+		return fechaVencimiento;
+	}
+
+	public String getTipoProducto() {
+		return tipoProducto;
+	}
+
+	public int getCantidadDisponible() {
+		return cantidadDisponible;
+	}
+
+	public int getCantidadCreada() {
+		return cantidadCreada;
+	}
+
+	public void setId(Long id) {
+		this.id = id;
+	}
+
+	public void setNombre(String nombre) {
+		this.nombre = nombre;
 	}
 
 	public void setPrecio(Double precio) {
 		this.precio = precio;
 	}
 
-	public Date getCreateAt() {
-		return createAt;
+	public void setFechaCreacion(Date fechaCreacion) {
+		this.fechaCreacion = fechaCreacion;
 	}
 
-	public void setCreateAt(Date createAt) {
-		this.createAt = createAt;
+	public void setFechaVencimiento(Date fechaVencimiento) {
+		this.fechaVencimiento = fechaVencimiento;
 	}
 
-	private static final long serialVersionUID = 1L;
+	public void setTipoProducto(String tipoProducto) {
+		this.tipoProducto = tipoProducto;
+	}
 
+	public void setCantidadDisponible(int cantidadDisponible) {
+		this.cantidadDisponible = cantidadDisponible;
+	}
+
+	public void setCantidadCreada(int cantidadCreada) {
+		this.cantidadCreada = cantidadCreada;
+	}
+	
+	
 }

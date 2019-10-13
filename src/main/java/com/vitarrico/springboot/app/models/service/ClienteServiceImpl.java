@@ -67,6 +67,7 @@ public class ClienteServiceImpl implements IClienteService{
 	@Override
 	@Transactional(readOnly = true)
 	public List<Producto> findByNombre(String term) {
+		//return servicioProductoFeign.buscarProductoPorNombre(term);
 		return productoDao.findByNombreLikeIgnoreCase("%"+term+"%");
 	}
 
