@@ -46,7 +46,7 @@ public class FacturaController {
 	@GetMapping("/ver/{id}")
 	public String ver(@PathVariable(value = "id") Long id, Model model, RedirectAttributes flash) {
 
-		Factura factura = clienteService.fetchFacturaByIdWithClienteWhithItemFacturaWithProducto(id); // clienteService.findFacturaById(id);
+		Factura factura = clienteService.fetchFacturaByIdWithClienteWhithItemFacturaWithProducto(id);
 
 		if (factura == null) {
 			flash.addFlashAttribute("error", "La factura no existe en la base de datos!");
@@ -105,13 +105,15 @@ public class FacturaController {
 
 			ItemFactura linea = new ItemFactura();
 			linea.setCantidad(cantidad[i]);
-
+	
 			if (linea.getCantidad() > producto.getCantidadDisponible()) {
 				model.addAttribute("titulo", "Crear Factura");
 				model.addAttribute("error", "No hay productos suficientes para " + producto.getNombre()
 						+ " cantidad disponible " + producto.getCantidadDisponible());
+
 				return "factura/form";
 			}
+
 			linea.setProducto(producto);
 			factura.addItemFactura(linea);
 			Integer restarCantidad = producto.getCantidadDisponible() - linea.getCantidad();
@@ -121,15 +123,22 @@ public class FacturaController {
 				producto.setCantidadDisponible(restarCantidad);
 			}
 			servicioProducto.modificarCantidadDisponible(producto.getId(), producto);
+
+			if (producto.getCantidadDisponible() == 0) {
+				servicioProducto.enviarEmailProductoAgotado(producto);
+			}
+
 			log.info("ID: " + itemId[i].toString() + ", cantidad: " + cantidad[i].toString());
 		}
 
 		clienteService.saveFactura(factura);
+
 		status.setComplete();
 
 		flash.addFlashAttribute("success", "Factura creada con éxito!");
 
 		return "redirect:/ver/" + factura.getCliente().getId();
+
 	}
 
 	@GetMapping("/eliminar/{id}")

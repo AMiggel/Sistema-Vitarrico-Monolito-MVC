@@ -1,6 +1,7 @@
 package com.vitarrico.springboot.app.controllers;
 
 import java.net.MalformedURLException;
+import java.util.Calendar;
 import java.util.Map;
 
 import javax.validation.Valid;
@@ -24,12 +25,14 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.SessionAttributes;
 import org.springframework.web.bind.support.SessionStatus;
-import org.springframework.web.multipart.MultipartFile;
+
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.vitarrico.springboot.app.models.entity.Cliente;
+
 import com.vitarrico.springboot.app.models.service.IClienteService;
 import com.vitarrico.springboot.app.models.service.IUploadFileService;
+
 import com.vitarrico.springboot.app.util.paginator.PageRender;
 
 @CrossOrigin(origins = "http://localhost:4200")
@@ -42,7 +45,7 @@ public class ClienteController {
 
 	@Autowired
 	private IUploadFileService uploadFileService;
-
+	
 	@GetMapping(value = "/uploads/{filename:.+}")
 	public ResponseEntity<Resource> verFoto(@PathVariable String filename) {
 
@@ -68,7 +71,8 @@ public class ClienteController {
 			flash.addFlashAttribute("error", "El cliente no existe en la base de datos");
 			return "redirect:/listar";
 		}
-
+		
+	
 		model.put("cliente", cliente);
 		model.put("titulo", "Detalle cliente: " + cliente.getNombre());
 		return "ver";
@@ -118,8 +122,7 @@ public class ClienteController {
 	}
 
 	@RequestMapping(value = "/form", method = RequestMethod.POST)
-	public String guardar(@Valid Cliente cliente, BindingResult result, Model model,
-			@RequestParam("file") MultipartFile foto, RedirectAttributes flash, SessionStatus status) {
+	public String guardar(@Valid Cliente cliente, BindingResult result, Model model, RedirectAttributes flash, SessionStatus status) {
 
 		if (result.hasErrors()) {
 			model.addAttribute("titulo", "Formulario de Cliente");
@@ -128,7 +131,7 @@ public class ClienteController {
 
 
 		String mensajeFlash = (cliente.getId() != null) ? "Cliente editado con éxito!" : "Cliente creado con éxito!";
-
+		cliente.setCreateAt(Calendar.getInstance().getTime());
 		clienteService.save(cliente);
 		status.setComplete();
 		flash.addFlashAttribute("success", mensajeFlash);

@@ -3,6 +3,8 @@ package com.vitarrico.springboot.app.models.service.productos;
 import java.util.Calendar;
 import java.util.List;
 
+import javax.transaction.Transactional;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
@@ -12,16 +14,16 @@ import com.vitarrico.springboot.app.models.dao.IProductoDao;
 import com.vitarrico.springboot.app.models.entity.Producto;
 import com.vitarrico.springboot.app.models.service.productos.excepcion.ExcepcionInventario;
 
-
 @Service
 public class ServicioProducto implements IServicioProducto {
 
 	public static final String PRODUCTO_INEXISTENTE = "El producto no existe en la base de datos";
 	public static final String CANTIDAD_CREADA_INVALIDA = "Debe ingresar una cantidad válida";
+	public static final String CAMPO_NULO= " el campo %s es requerido";
 
 	@Autowired
 	private JavaMailSender javaMailSender;
-	
+
 	@Autowired
 	private IProductoDao repositorioProducto;
 
@@ -33,24 +35,21 @@ public class ServicioProducto implements IServicioProducto {
 	@Override
 	public Producto crearProducto(Producto producto) {
 
-		int disponible = 0;
-		Producto productoExistente = repositorioProducto.findByNombres(producto.getNombre());
+		
 		producto.setCantidadDisponible(producto.getCantidadCreada());
 		if (producto.getCantidadCreada() <= 0) {
 			throw new ExcepcionInventario(CANTIDAD_CREADA_INVALIDA);
+		} else if (producto.getFechaVencimiento() == null) {
+			throw new ExcepcionInventario(String.format(CAMPO_NULO,"Fecha Vencimiento" ));
+		} else if (producto.getNombre() == null) {
+			throw new ExcepcionInventario(String.format(CAMPO_NULO,"Nombre" ));
+		}else if (producto.getPrecio() == null) {
+			throw new ExcepcionInventario(String.format(CAMPO_NULO,"precio" ));
 		}
 
-		if (productoExistente != null) {
-			productoExistente.setCantidadCreada(producto.getCantidadCreada());
-			disponible = productoExistente.getCantidadDisponible() + producto.getCantidadCreada();
-			productoExistente.setCantidadDisponible(disponible);
-			return repositorioProducto.save(productoExistente);
-		} else {
 			asignarFechaCreacion(producto);
-			enviarEmail(producto);
+
 			return repositorioProducto.save(producto);
-		
-		}
 	}
 
 	@Override
@@ -65,6 +64,7 @@ public class ServicioProducto implements IServicioProducto {
 	}
 
 	@Override
+	@Transactional
 	public void borrarProducto(Long id) {
 		repositorioProducto.deleteById(id);
 	}
@@ -81,16 +81,9 @@ public class ServicioProducto implements IServicioProducto {
 	@Override
 	public Producto modificarProducto(Long id, Producto producto) {
 		Producto productoActual = buscarProductoPorId(id);
-		Integer diferencia = 0;
-		Integer disponible = 0;
-
-		if (producto.getCantidadDisponible() == 0) {
-			diferencia = producto.getCantidadCreada() - productoActual.getCantidadCreada();
-			disponible = productoActual.getCantidadDisponible() + diferencia;
-			productoActual.setCantidadCreada(producto.getCantidadCreada());
-			productoActual.setCantidadDisponible(disponible);
-		}
 		
+		productoActual.setCantidadCreada(producto.getCantidadCreada());
+		productoActual.setCantidadDisponible(producto.getCantidadCreada());
 		productoActual.setNombre(producto.getNombre());
 		productoActual.setFechaVencimiento(producto.getFechaVencimiento());
 		productoActual.setPrecio(producto.getPrecio());
@@ -101,14 +94,15 @@ public class ServicioProducto implements IServicioProducto {
 	public void asignarFechaCreacion(Producto producto) {
 		producto.setFechaCreacion(Calendar.getInstance().getTime());
 	}
-	
-	public void enviarEmail(Producto producto) {
-		
-		SimpleMailMessage mensaje= new SimpleMailMessage();
+
+	public void enviarEmailProductoAgotado(Producto producto) {
+
+		SimpleMailMessage mensaje = new SimpleMailMessage();
 		mensaje.setTo("amarin@unac.edu.co");
-		mensaje.setSubject("probando mensaje");
-		mensaje.setText("se ha creado un producto :" + producto.getNombre()+"\ncantidad creada : " + producto.getCantidadCreada() );
-		
+		mensaje.setSubject("Producto agotado");
+		mensaje.setText("El producto :" + producto.getNombre() + " con fecha de vencimiento : "
+				+ producto.getFechaVencimiento() + "se agotó");
+
 		javaMailSender.send(mensaje);
 	}
 

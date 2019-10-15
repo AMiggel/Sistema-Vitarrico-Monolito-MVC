@@ -19,6 +19,8 @@ import javax.persistence.TemporalType;
 
 
 import javax.validation.constraints.Email;
+import javax.validation.constraints.NotEmpty;
+
 
 
 @Entity
@@ -31,17 +33,22 @@ public class Cliente implements Serializable {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 
-
+	@NotEmpty
 	private String nombre;
 	
-
+	@NotEmpty
 	private String apellido;
+	
+	@NotEmpty
+	private String direccion;
+	
+	@NotEmpty
+	private String ciudad;
 	
 	
 	@Email
 	private String email;
 
-	
 	@Column(name = "create_at")
 	@Temporal(TemporalType.DATE)
 	private Date createAt;
@@ -109,5 +116,23 @@ public class Cliente implements Serializable {
 	public String toString() {
 		return nombre + " " + apellido;
 	}
+
+	public String getDireccion() {
+		return direccion;
+	}
+
+	public String getCiudad() {
+		return ciudad;
+	}
+
+	public void setDireccion(String direccion) {
+		this.direccion = direccion;
+	}
+
+	public void setCiudad(String ciudad) {
+		this.ciudad = ciudad;
+	}
+	
+	
 
 }

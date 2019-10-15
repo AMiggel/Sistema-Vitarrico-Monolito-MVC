@@ -95,6 +95,8 @@ public class Producto implements Serializable {
 	}
 
 	public void setFechaVencimiento(Date fechaVencimiento) {
+		int dia = fechaVencimiento.getDate() +1;
+		fechaVencimiento.setDate(dia);
 		this.fechaVencimiento = fechaVencimiento;
 	}
 
