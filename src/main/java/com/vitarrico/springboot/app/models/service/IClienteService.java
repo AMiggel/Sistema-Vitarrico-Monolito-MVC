@@ -11,7 +11,7 @@ import com.vitarrico.springboot.app.models.entity.Producto;
 
 public interface IClienteService {
 
-	public List<Cliente> findAll();
+	public List<Cliente> findAllByNombre();
 	
 	public Page<Cliente> findAll(Pageable pageable);
 

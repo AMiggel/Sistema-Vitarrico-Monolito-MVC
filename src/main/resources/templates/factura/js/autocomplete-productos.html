@@ -20,6 +20,8 @@
 									value : item.id,
 									label : item.nombre,
 									precio : item.precio,
+									cantidadDisponible: item.cantidadDisponible
+									
 								};
 							}));
 						},
@@ -38,7 +40,7 @@
 					linea = linea.replace(/{ID}/g, ui.item.value);
 					linea = linea.replace(/{NOMBRE}/g, ui.item.label);
 					linea = linea.replace(/{PRECIO}/g, ui.item.precio);
-					
+					linea = linea.replace(/{CANTIDAD}/g, ui.item.cantidadDisponible);
 					$("#cargarItemProductos tbody").append(linea);
 					itemsHelper.calcularImporte(ui.item.value, ui.item.precio, 1);
 

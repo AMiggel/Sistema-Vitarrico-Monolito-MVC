@@ -100,12 +100,21 @@ public class FacturaController {
 			return "factura/form";
 		}
 
+	
+		
 		for (int i = 0; i < itemId.length; i++) {
 			Producto producto = clienteService.findProductoById(itemId[i]);
 
 			ItemFactura linea = new ItemFactura();
 			linea.setCantidad(cantidad[i]);
 	
+			if(linea.getCantidad() <= 0) {
+				model.addAttribute("titulo", "Crear Factura");
+				model.addAttribute("error", "ingrese una cantidad de productos valida para el item: " + producto.getNombre());
+
+				return "factura/form";
+			}
+			
 			if (linea.getCantidad() > producto.getCantidadDisponible()) {
 				model.addAttribute("titulo", "Crear Factura");
 				model.addAttribute("error", "No hay productos suficientes para " + producto.getNombre()
@@ -130,6 +139,7 @@ public class FacturaController {
 
 			log.info("ID: " + itemId[i].toString() + ", cantidad: " + cantidad[i].toString());
 		}
+		
 
 		clienteService.saveFactura(factura);
 

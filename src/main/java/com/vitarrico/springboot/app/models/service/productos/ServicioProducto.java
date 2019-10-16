@@ -1,5 +1,6 @@
 package com.vitarrico.springboot.app.models.service.productos;
 
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 
@@ -19,7 +20,7 @@ public class ServicioProducto implements IServicioProducto {
 
 	public static final String PRODUCTO_INEXISTENTE = "El producto no existe en la base de datos";
 	public static final String CANTIDAD_CREADA_INVALIDA = "Debe ingresar una cantidad válida";
-	public static final String CAMPO_NULO= " el campo %s es requerido";
+	public static final String CAMPO_NULO = " el campo %s es requerido";
 
 	@Autowired
 	private JavaMailSender javaMailSender;
@@ -35,21 +36,20 @@ public class ServicioProducto implements IServicioProducto {
 	@Override
 	public Producto crearProducto(Producto producto) {
 
-		
 		producto.setCantidadDisponible(producto.getCantidadCreada());
 		if (producto.getCantidadCreada() <= 0) {
 			throw new ExcepcionInventario(CANTIDAD_CREADA_INVALIDA);
 		} else if (producto.getFechaVencimiento() == null) {
-			throw new ExcepcionInventario(String.format(CAMPO_NULO,"Fecha Vencimiento" ));
+			throw new ExcepcionInventario(String.format(CAMPO_NULO, "Fecha Vencimiento"));
 		} else if (producto.getNombre() == null) {
-			throw new ExcepcionInventario(String.format(CAMPO_NULO,"Nombre" ));
-		}else if (producto.getPrecio() == null) {
-			throw new ExcepcionInventario(String.format(CAMPO_NULO,"precio" ));
+			throw new ExcepcionInventario(String.format(CAMPO_NULO, "Nombre"));
+		} else if (producto.getPrecio() == null) {
+			throw new ExcepcionInventario(String.format(CAMPO_NULO, "precio"));
 		}
 
-			asignarFechaCreacion(producto);
+		asignarFechaCreacion(producto);
 
-			return repositorioProducto.save(producto);
+		return repositorioProducto.save(producto);
 	}
 
 	@Override
@@ -81,7 +81,9 @@ public class ServicioProducto implements IServicioProducto {
 	@Override
 	public Producto modificarProducto(Long id, Producto producto) {
 		Producto productoActual = buscarProductoPorId(id);
-		
+
+		int dia = producto.getFechaVencimiento().getDate() - 1;
+		producto.getFechaVencimiento().setDate(dia);
 		productoActual.setCantidadCreada(producto.getCantidadCreada());
 		productoActual.setCantidadDisponible(producto.getCantidadCreada());
 		productoActual.setNombre(producto.getNombre());
@@ -100,9 +102,9 @@ public class ServicioProducto implements IServicioProducto {
 		SimpleMailMessage mensaje = new SimpleMailMessage();
 		mensaje.setTo("amarin@unac.edu.co");
 		mensaje.setSubject("Producto agotado");
-		mensaje.setText("El producto :" + producto.getNombre() + " con fecha de vencimiento : "
-				+ producto.getFechaVencimiento() + "se agotó");
 
+		mensaje.setText("El producto: " + producto.getNombre() + " con fecha de vencimiento : "
+				+ producto.getFechaVencimiento() + "se agotó");
 		javaMailSender.send(mensaje);
 	}
 

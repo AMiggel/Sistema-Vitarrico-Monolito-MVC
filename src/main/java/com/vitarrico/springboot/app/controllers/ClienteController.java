@@ -2,6 +2,7 @@ package com.vitarrico.springboot.app.controllers;
 
 import java.net.MalformedURLException;
 import java.util.Calendar;
+import java.util.List;
 import java.util.Map;
 
 import javax.validation.Valid;
@@ -81,14 +82,11 @@ public class ClienteController {
 	@RequestMapping(value = "/listar", method = RequestMethod.GET)
 	public String listar(@RequestParam(name = "page", defaultValue = "0") int page, Model model) {
 
-		Pageable pageRequest = PageRequest.of(page, 4);
-
-		Page<Cliente> clientes = clienteService.findAll(pageRequest);
-
-		PageRender<Cliente> pageRender = new PageRender<Cliente>("/listar", clientes);
+	 List<Cliente> clientes = clienteService.findAllByNombre();
+	
 		model.addAttribute("titulo", "Listado de clientes");
 		model.addAttribute("clientes", clientes);
-		model.addAttribute("page", pageRender);
+		
 		return "listar";
 	}
 
