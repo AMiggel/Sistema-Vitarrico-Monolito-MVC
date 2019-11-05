@@ -4,7 +4,6 @@ import java.util.List;
 
 import com.vitarrico.springboot.app.models.entity.Producto;
 
-
 public interface IServicioProducto {
 
 	public List<Producto> listar();
@@ -14,8 +13,9 @@ public interface IServicioProducto {
 	 * 
 	 * @param usuario
 	 * @return la entidad del producto
+	 * @throws Exception 
 	 */
-	public Producto crearProducto(Producto producto);
+	public Producto crearProducto(Producto producto) throws Exception;
 
 	/**
 	 * Permite buscar un producto ya creado por id
@@ -29,7 +29,7 @@ public interface IServicioProducto {
 
 	public Producto modificarProducto(Long id, Producto producto);
 
-	public Producto modificarCantidadDisponible(Long id, Producto producto);
-	
-	public Producto buscarProductoPorNombre(String nombre);
+	public List<Producto> buscarProductoPorNombre(String nombre);
 }
+
+

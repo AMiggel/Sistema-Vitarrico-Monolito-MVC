@@ -1,21 +1,18 @@
 package com.vitarrico.springboot.app.models.entity;
 
 import java.io.Serializable;
-import java.util.Date;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.Table;
-import javax.persistence.Temporal;
-import javax.persistence.TemporalType;
+
 
 @Entity
-@Table(name = "productos")
 public class Producto implements Serializable {
 
+	
 	/**
 	 * 
 	 */
@@ -29,22 +26,11 @@ public class Producto implements Serializable {
 
 	private Double precio;
 
-	@Temporal(TemporalType.DATE)
-	@Column(name = "fecha_creacion")
-	private Date fechaCreacion;
-
-	@Temporal(TemporalType.DATE)
-	@Column(name = "fecha_vencimiento")
-	private Date fechaVencimiento;
-
 	@Column(name = "tipo_producto")
 	private String tipoProducto;
 
-	@Column(name = "cantidad_disponible")
-	private int cantidadDisponible;
-
-	@Column(name = "cantidad_creada")
-	private int cantidadCreada;
+	@Column(name="stock_minimo")
+	private int stockMinimo;
 
 	public Long getId() {
 		return id;
@@ -58,24 +44,12 @@ public class Producto implements Serializable {
 		return precio;
 	}
 
-	public Date getFechaCreacion() {
-		return fechaCreacion;
-	}
-
-	public Date getFechaVencimiento() {
-		return fechaVencimiento;
-	}
-
 	public String getTipoProducto() {
 		return tipoProducto;
 	}
 
-	public int getCantidadDisponible() {
-		return cantidadDisponible;
-	}
-
-	public int getCantidadCreada() {
-		return cantidadCreada;
+	public int getStockMinimo() {
+		return stockMinimo;
 	}
 
 	public void setId(Long id) {
@@ -90,27 +64,13 @@ public class Producto implements Serializable {
 		this.precio = precio;
 	}
 
-	public void setFechaCreacion(Date fechaCreacion) {
-		this.fechaCreacion = fechaCreacion;
-	}
-
-	public void setFechaVencimiento(Date fechaVencimiento) {
-		int dia = fechaVencimiento.getDate() +1;
-		fechaVencimiento.setDate(dia);
-		this.fechaVencimiento = fechaVencimiento;
-	}
-
 	public void setTipoProducto(String tipoProducto) {
 		this.tipoProducto = tipoProducto;
 	}
 
-	public void setCantidadDisponible(int cantidadDisponible) {
-		this.cantidadDisponible = cantidadDisponible;
+	public void setStockMinimo(int stockMinimo) {
+		this.stockMinimo = stockMinimo;
 	}
 
-	public void setCantidadCreada(int cantidadCreada) {
-		this.cantidadCreada = cantidadCreada;
-	}
-	
-	
+
 }

@@ -25,9 +25,9 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import com.vitarrico.springboot.app.models.entity.Cliente;
 import com.vitarrico.springboot.app.models.entity.Factura;
 import com.vitarrico.springboot.app.models.entity.ItemFactura;
-import com.vitarrico.springboot.app.models.entity.Producto;
+import com.vitarrico.springboot.app.models.entity.Lote;
 import com.vitarrico.springboot.app.models.service.IClienteService;
-import com.vitarrico.springboot.app.models.service.productos.ServicioProducto;
+import com.vitarrico.springboot.app.models.service.productos.ServicioLote;
 
 @CrossOrigin(origins = "http://localhost:4200")
 @Controller
@@ -39,7 +39,8 @@ public class FacturaController {
 	private IClienteService clienteService;
 
 	@Autowired
-	private ServicioProducto servicioProducto;
+	private ServicioLote servicioProducto;
+	
 
 	private final Logger log = LoggerFactory.getLogger(getClass());
 
@@ -49,12 +50,12 @@ public class FacturaController {
 		Factura factura = clienteService.fetchFacturaByIdWithClienteWhithItemFacturaWithProducto(id);
 
 		if (factura == null) {
-			flash.addFlashAttribute("error", "La factura no existe en la base de datos!");
+			flash.addFlashAttribute("error", "El pedido no existe en la base de datos!");
 			return "redirect:/listar";
 		}
 
 		model.addAttribute("factura", factura);
-		model.addAttribute("titulo", "Factura: ".concat(factura.getDescripcion()));
+		model.addAttribute("titulo", "Pedido: ".concat(factura.getDescripcion()));
 		return "factura/ver";
 	}
 
@@ -73,13 +74,13 @@ public class FacturaController {
 		factura.setCliente(cliente);
 
 		model.put("factura", factura);
-		model.put("titulo", "Crear Factura");
+		model.put("titulo", "Crear pedido");
 
 		return "factura/form";
 	}
 
 	@GetMapping(value = "/cargar-productos/{term}", produces = { "application/json" })
-	public @ResponseBody List<Producto> cargarProductos(@PathVariable String term) {
+	public @ResponseBody List<Lote> cargarProductos(@PathVariable String term) {
 		return clienteService.findByNombre(term);
 	}
 
@@ -90,33 +91,32 @@ public class FacturaController {
 			SessionStatus status) {
 
 		if (result.hasErrors()) {
-			model.addAttribute("titulo", "Crear Factura");
+			model.addAttribute("titulo", "Crear pedido");
 			return "factura/form";
 		}
 
 		if (itemId == null || itemId.length == 0) {
-			model.addAttribute("titulo", "Crear Factura");
-			model.addAttribute("error", "Error: La factura debe tener al menos un producto!");
+			model.addAttribute("titulo", "Crear pedido");
+			model.addAttribute("error", "Error: El pedido debe tener al menos un producto!");
 			return "factura/form";
 		}
 
 	
 		
 		for (int i = 0; i < itemId.length; i++) {
-			Producto producto = clienteService.findProductoById(itemId[i]);
+			Lote producto = clienteService.findProductoById(itemId[i]);
 
 			ItemFactura linea = new ItemFactura();
 			linea.setCantidad(cantidad[i]);
 	
 			if(linea.getCantidad() <= 0) {
-				model.addAttribute("titulo", "Crear Factura");
+				model.addAttribute("titulo", "Crear pedido");
 				model.addAttribute("error", "ingrese una cantidad de productos valida para el item: " + producto.getNombre());
-
 				return "factura/form";
 			}
 			
 			if (linea.getCantidad() > producto.getCantidadDisponible()) {
-				model.addAttribute("titulo", "Crear Factura");
+				model.addAttribute("titulo", "Crear pedido");
 				model.addAttribute("error", "No hay productos suficientes para " + producto.getNombre()
 						+ " cantidad disponible " + producto.getCantidadDisponible());
 
@@ -132,9 +132,11 @@ public class FacturaController {
 				producto.setCantidadDisponible(restarCantidad);
 			}
 			servicioProducto.modificarCantidadDisponible(producto.getId(), producto);
-
-			if (producto.getCantidadDisponible() == 0) {
-				servicioProducto.enviarEmailProductoAgotado(producto);
+			//aqui
+			if (producto.getCantidadDisponible() <= producto.getStockMinimo() && producto.getCantidadDisponible() != 0) {
+				servicioProducto.enviarEmailProductoAgotado(producto, servicioProducto.buscarMailPorId((long) 1).getDestinatario());
+			} else if (producto.getCantidadDisponible() == 0){
+				servicioProducto.enviarEmailProductoAgotado2(producto, servicioProducto.buscarMailPorId((long)1).getDestinatario());
 			}
 
 			log.info("ID: " + itemId[i].toString() + ", cantidad: " + cantidad[i].toString());
@@ -145,7 +147,7 @@ public class FacturaController {
 
 		status.setComplete();
 
-		flash.addFlashAttribute("success", "Factura creada con éxito!");
+		flash.addFlashAttribute("success", "pedido creado con éxito!");
 
 		return "redirect:/ver/" + factura.getCliente().getId();
 
@@ -158,10 +160,10 @@ public class FacturaController {
 
 		if (factura != null) {
 			clienteService.deleteFactura(id);
-			flash.addFlashAttribute("success", "Factura eliminada con éxito!");
+			flash.addFlashAttribute("success", "pedido eliminado con éxito!");
 			return "redirect:/ver/" + factura.getCliente().getId();
 		}
-		flash.addFlashAttribute("error", "La factura no existe en la base de datos, no se pudo eliminar!");
+		flash.addFlashAttribute("error", "El pedido no existe en la base de datos, no se pudo eliminar!");
 
 		return "redirect:/listar";
 	}

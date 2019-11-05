@@ -9,7 +9,7 @@ import com.vitarrico.springboot.app.models.entity.Cliente;
 
 public interface IClienteDao extends PagingAndSortingRepository<Cliente, Long> {
 
-	public List<Cliente> findAllByOrderByApellidoAsc();
+	public List<Cliente> findAllByOrderByCreateAtDesc();
 	
 	
 	@Query("select c from Cliente c left join fetch c.facturas f where c.id=?1")

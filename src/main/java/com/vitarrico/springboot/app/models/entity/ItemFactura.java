@@ -23,7 +23,7 @@ public class ItemFactura implements Serializable {
 	
 	@ManyToOne(fetch=FetchType.LAZY)
 	@JoinColumn(name="producto_id")
-	private Producto producto;
+	private Lote producto;
 
 	public Long getId() {
 		return id;
@@ -41,11 +41,11 @@ public class ItemFactura implements Serializable {
 		this.cantidad = cantidad;
 	}
 
-	public Producto getProducto() {
+	public Lote getProducto() {
 		return producto;
 	}
 
-	public void setProducto(Producto producto) {
+	public void setProducto(Lote producto) {
 		this.producto = producto;
 	}
 

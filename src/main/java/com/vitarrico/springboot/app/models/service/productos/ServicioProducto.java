@@ -1,116 +1,69 @@
 package com.vitarrico.springboot.app.models.service.productos;
 
-import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.List;
 
-import javax.transaction.Transactional;
-
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.mail.SimpleMailMessage;
-import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Service;
 
 import com.vitarrico.springboot.app.models.dao.IProductoDao;
 import com.vitarrico.springboot.app.models.entity.Producto;
-import com.vitarrico.springboot.app.models.service.productos.excepcion.ExcepcionInventario;
 
 @Service
-public class ServicioProducto implements IServicioProducto {
-
-	public static final String PRODUCTO_INEXISTENTE = "El producto no existe en la base de datos";
-	public static final String CANTIDAD_CREADA_INVALIDA = "Debe ingresar una cantidad válida";
-	public static final String CAMPO_NULO = " el campo %s es requerido";
+public class ServicioProducto implements IServicioProducto{
 
 	@Autowired
-	private JavaMailSender javaMailSender;
-
-	@Autowired
-	private IProductoDao repositorioProducto;
+	private IProductoDao productoDao;
 
 	@Override
 	public List<Producto> listar() {
-		return (List<Producto>) repositorioProducto.findAllByOrderByFechaVencimientoAsc();
+		return (List<Producto>) productoDao.findAll();
 	}
 
 	@Override
-	public Producto crearProducto(Producto producto) {
-
-		producto.setCantidadDisponible(producto.getCantidadCreada());
-		if (producto.getCantidadCreada() <= 0) {
-			throw new ExcepcionInventario(CANTIDAD_CREADA_INVALIDA);
-		} else if (producto.getFechaVencimiento() == null) {
-			throw new ExcepcionInventario(String.format(CAMPO_NULO, "Fecha Vencimiento"));
-		} else if (producto.getNombre() == null) {
-			throw new ExcepcionInventario(String.format(CAMPO_NULO, "Nombre"));
-		} else if (producto.getPrecio() == null) {
-			throw new ExcepcionInventario(String.format(CAMPO_NULO, "precio"));
+	public Producto crearProducto(Producto producto) throws Exception {
+		
+		if (producto.getNombre()==null) {
+			throw new Exception("Nombre es un campo obligatorio");
+		} else if (producto.getStockMinimo()<=0 ) {
+			throw new Exception("Debe ingresar un stock minimo para notificar que el producto se está agotando");
+		} else if (producto.getPrecio()==null) {
+			throw new Exception("Ingrese un precio al producto");
+		} else if (producto.getTipoProducto()==null) {
+			throw new Exception("Ingrese el tipo de producto");
 		}
-
-		asignarFechaCreacion(producto);
-
-		return repositorioProducto.save(producto);
+		
+		for (int i = 0; i < listar().size(); i++) {
+			if (producto.getNombre().equalsIgnoreCase(listar().get(i).getNombre())) {
+				throw new Exception("Ya hay registrado un producto con este mismo nombre en el sistema");
+			}
+		}
+		
+		return productoDao.save(producto);
 	}
 
 	@Override
 	public Producto buscarProductoPorId(Long id) {
-		Producto producto = repositorioProducto.findById(id).orElse(null);
-
-		if (producto == null) {
-			throw new ExcepcionInventario(PRODUCTO_INEXISTENTE);
-		} else {
-			return producto;
-		}
+		return productoDao.findById(id).orElse(null);
 	}
 
 	@Override
-	@Transactional
 	public void borrarProducto(Long id) {
-		repositorioProducto.deleteById(id);
-	}
-
-	@Override
-	public Producto modificarCantidadDisponible(Long id, Producto producto) {
-		Producto productoActual = buscarProductoPorId(id);
-
-		productoActual.setCantidadDisponible(producto.getCantidadDisponible());
-
-		return repositorioProducto.save(productoActual);
+		productoDao.deleteById(id);
+		
 	}
 
 	@Override
 	public Producto modificarProducto(Long id, Producto producto) {
 		Producto productoActual = buscarProductoPorId(id);
-
-		int dia = producto.getFechaVencimiento().getDate() - 1;
-		producto.getFechaVencimiento().setDate(dia);
-		productoActual.setCantidadCreada(producto.getCantidadCreada());
-		productoActual.setCantidadDisponible(producto.getCantidadCreada());
 		productoActual.setNombre(producto.getNombre());
-		productoActual.setFechaVencimiento(producto.getFechaVencimiento());
 		productoActual.setPrecio(producto.getPrecio());
-		productoActual.setTipoProducto(producto.getTipoProducto());
-		return repositorioProducto.save(productoActual);
-	}
-
-	public void asignarFechaCreacion(Producto producto) {
-		producto.setFechaCreacion(Calendar.getInstance().getTime());
-	}
-
-	public void enviarEmailProductoAgotado(Producto producto) {
-
-		SimpleMailMessage mensaje = new SimpleMailMessage();
-		mensaje.setTo("amarin@unac.edu.co");
-		mensaje.setSubject("Producto agotado");
-
-		mensaje.setText("El producto: " + producto.getNombre() + " con fecha de vencimiento : "
-				+ producto.getFechaVencimiento() + "se agotó");
-		javaMailSender.send(mensaje);
+		productoActual.setStockMinimo(producto.getStockMinimo());
+		productoActual.setTipoProducto(productoActual.getTipoProducto());
+		return productoDao.save(productoActual);
 	}
 
 	@Override
-	public Producto buscarProductoPorNombre(String nombre) {
-		return repositorioProducto.findByNombres(nombre);
+	public List<Producto> buscarProductoPorNombre(String nombre) {
+		return  productoDao.findByNombreContainingIgnoreCase(nombre);
 	}
-
 }

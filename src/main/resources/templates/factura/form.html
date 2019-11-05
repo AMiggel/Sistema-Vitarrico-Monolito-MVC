@@ -32,8 +32,9 @@
 						<label for="descripcion" class="col-sm-2 col-form-label"
 							th:text="'Descripción'"></label>
 						<div class="col-sm-6">
-							<input type="text" th:field="*{descripcion}" class="form-control" th:errorclass="'form-control is-invalid'" />
-							<div class="invalid-feedback" th:if="${#fields.hasErrors('descripcion')}" th:errors="*{descripcion}"></div>
+							<input type="text" th:field="*{descripcion}" class="form-control"
+								required="true" />
+							<div class="invalid-feedback"></div>
 						</div>
 					</div>
 
@@ -63,6 +64,7 @@
 								<th>Nombre</th>
 								<th>Precio</th>
 								<th>Cantidad</th>
+								<th>Dias restantes para vencer</th>
 								<th>Total</th>
 								<th>Eliminar</th>
 							</tr>
@@ -70,12 +72,19 @@
 						<tbody>
 						</tbody>
 					</table>
-					<h5>Total <span class="badge badge-secondary" id="gran_total">0</span></h5>
+					<h5>
+						Total <span class="badge badge-secondary" id="gran_total">0</span>
+					</h5>
 
 					<div class="form-group row">
-						<div class="col-sm-6">
+						<div class="col-sm-2">
 							<input type="submit" th:value="${titulo}"
 								class="btn btn-secondary" />
+						</div>
+						<div class="col-sm-6">
+							<a class="btn btn-primary btn-xs" target="_blank"
+								th:href="@{'https://www.google.es/maps/dir/VITARRICO+Food+Industries,+Calle+34,+Medellin,+Antioquia/'+${factura.cliente.direccion}+',' + ${factura.cliente.ciudad}}">
+								Ver el tiempo promdeio de envío</a>
 						</div>
 					</div>
 				</form>
@@ -86,6 +95,9 @@
 	</div>
 
 	<footer th:replace="layout/layout :: footer"></footer>
+
+
 	<script th:replace="factura/js/autocomplete-productos :: javascript"></script>
+
 </body>
 </html>

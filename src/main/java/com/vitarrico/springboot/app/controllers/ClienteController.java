@@ -10,9 +10,6 @@ import javax.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
 
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -34,7 +31,6 @@ import com.vitarrico.springboot.app.models.entity.Cliente;
 import com.vitarrico.springboot.app.models.service.IClienteService;
 import com.vitarrico.springboot.app.models.service.IUploadFileService;
 
-import com.vitarrico.springboot.app.util.paginator.PageRender;
 
 @CrossOrigin(origins = "http://localhost:4200")
 @Controller

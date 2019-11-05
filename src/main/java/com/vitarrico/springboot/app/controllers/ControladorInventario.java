@@ -13,7 +13,10 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.vitarrico.springboot.app.models.entity.Lote;
+import com.vitarrico.springboot.app.models.entity.Mail;
 import com.vitarrico.springboot.app.models.entity.Producto;
+import com.vitarrico.springboot.app.models.service.productos.IServicioLote;
 import com.vitarrico.springboot.app.models.service.productos.IServicioProducto;
 
 
@@ -23,7 +26,15 @@ import com.vitarrico.springboot.app.models.service.productos.IServicioProducto;
 public class ControladorInventario {
 
 	@Autowired
+	private IServicioLote servicioLote;
+	
+	@Autowired
 	private IServicioProducto servicioProducto;
+	
+	@GetMapping(value="/lotes")
+	public List<Lote> obtenerLotes(){
+		return servicioLote.listar();
+	}
 	
 	@GetMapping(value="/productos")
 	public List<Producto> obtenerProductos(){
@@ -31,13 +42,45 @@ public class ControladorInventario {
 	}
 	
 	@PostMapping(value="/crear-producto")
-	public Producto crearProducto(@RequestBody Producto producto) {
+	public Producto cearProducto(@RequestBody Producto producto) throws Exception {
 		return servicioProducto.crearProducto(producto);
 	}
 	
-	@GetMapping(value = "/producto/{id}")
-	public Producto buscarProductoPorId(@PathVariable(value = "id") Long id) {
-		return servicioProducto.buscarProductoPorId(id);
+	
+	@PostMapping(value="/crear-lote")
+	public Lote crearLote(@RequestBody Lote producto) {
+		return servicioLote.crearLote(producto);
+	}
+	
+	@GetMapping(value = "/lote/{id}")
+	public Lote buscarLotePorId(@PathVariable(value = "id") Long id) {
+		return servicioLote.buscarLotePorId(id);
+	}
+	
+	@PutMapping(value= "modificar-lote/{id}")
+	public Lote modificarLote(@PathVariable (value = "id") Long id, @RequestBody Lote producto) {
+		return servicioLote.modificarLote(id, producto);
+	}
+	
+	@PutMapping(value= "modificar-cantidad/{id}")
+	public Lote modificarCantidadDisponible(@PathVariable (value = "id") Long id, @RequestBody Lote producto) {
+		return servicioLote.modificarCantidadDisponible(id, producto);
+	}
+	
+	@DeleteMapping(value= "/{id}")
+	public void borrarLote(@PathVariable (value="id")Long id) {
+		servicioLote.borrarLote(id);
+		
+	}
+	
+	@GetMapping(value="/productos/{nombre}" )
+	public List<Producto> buscarProductoPorNombre (@PathVariable (value="nombre") String nombre) {
+		return servicioProducto.buscarProductoPorNombre(nombre);
+	}
+	
+	@DeleteMapping(value="/producto/{id}")
+	public void eliminarProducto(@PathVariable (value="id") Long id) {
+		servicioProducto.borrarProducto(id);
 	}
 	
 	@PutMapping(value= "modificar-producto/{id}")
@@ -45,20 +88,21 @@ public class ControladorInventario {
 		return servicioProducto.modificarProducto(id, producto);
 	}
 	
-	@PutMapping(value= "modificar-cantidad/{id}")
-	public Producto modificarCantidadDisponible(@PathVariable (value = "id") Long id, @RequestBody Producto producto) {
-		return servicioProducto.modificarCantidadDisponible(id, producto);
+	@GetMapping(value = "/producto/{id}")
+	public Producto buscarProductoPorId(@PathVariable(value = "id") Long id) {
+		return servicioProducto.buscarProductoPorId(id);
 	}
 	
-	@DeleteMapping(value= "/{id}")
-	public void borrarProducto(@PathVariable (value="id")Long id) {
-		servicioProducto.borrarProducto(id);
-		
+
+	@PutMapping(value= "modificar-email/{id}")
+	public Mail modificarPEmail(@PathVariable (value = "id") Long id, @RequestBody Mail mail) {
+		return servicioLote.actualizarEmail(mail, id);
 	}
 	
-	@GetMapping(value="/productos/{nombre}")
-	public Producto buscarProductoPorNombre (@PathVariable (value="nombre") String nombre) {
-		return servicioProducto.buscarProductoPorNombre(nombre);
+	@GetMapping(value = "/buscar-email/{id}")
+	public Mail buscarEmailPorId(@PathVariable(value = "id") Long id) {
+		return  servicioLote.buscarMailPorId(id);
 	}
+	
 	
 }

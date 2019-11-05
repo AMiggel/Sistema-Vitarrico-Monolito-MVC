@@ -11,24 +11,29 @@
 			<div class="card-header" th:text="${titulo}"></div>
 			<div class="card-body">
 
-				<h4 class="card-title">
-					<a class="btn btn-primary btn-xs"
-						th:href="@{'/factura/form/' + ${cliente.id}}"
-						th:text="'crear factura'"></a>
-				</h4>
-
+				<div class="row">
+					<h4 class="card-title" style="margin-left:15px">
+						<a class="btn btn-primary btn-xs"
+							th:href="@{'/factura/form/' + ${cliente.id}}"
+							th:text="'crear pedido'"></a>
+					</h4>
+					<h4 class="card-title" style="margin-left:10px">
+						<a class="btn btn-primary btn-xs"
+							th:href="@{/form/} + ${cliente.id}" th:text="'editar'"></a>
+					</h4>
+				</div>
 				<ul class="list-group">
-					<li class="list-group-item" th:text="${cliente.nombre}"></li>
-					<li class="list-group-item" th:text="${cliente.apellido}"></li>
+					<li class="list-group-item"
+						th:text="${cliente.nombre} +' '+ ${cliente.apellido} "></li>
 					<li class="list-group-item" th:text="${cliente.email}"></li>
-					<li class="list-group-item" th:text="${cliente.createAt}"></li>
+					<!--<li class="list-group-item" th:text="${cliente.createAt}"></li>-->
 					<li class="list-group-item" th:text="${cliente.direccion}"></li>
 					<li class="list-group-item" th:text="${cliente.ciudad}"></li>
 				</ul>
 
 				<div th:if="${#lists.isEmpty(cliente.facturas)}"
 					class="alert alert-info my-4"
-					th:text="'No hay facturas asignadas para el cliente ' + ${cliente.nombre} + ' ' + ${cliente.apellido}"></div>
+					th:text="'No hay pedidos asignados para el cliente ' + ${cliente.nombre} + ' ' + ${cliente.apellido}"></div>
 
 				<table th:if="${not #lists.isEmpty(cliente.facturas)}"
 					class="table table-bordered table-striped my-4">
@@ -53,7 +58,7 @@
 							<td><a class="btn btn-danger btn-xs"
 								th:href="@{'/factura/eliminar/' + ${factura.id}}"
 								th:text="'eliminar'"
-								onclick="return confirm('¿Estas seguro que desea eliminar la factura?');"></a></td>
+								onclick="return confirm('Estas seguro que desea eliminar este pedido?');"></a></td>
 						</tr>
 					</tbody>
 

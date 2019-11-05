@@ -29,8 +29,7 @@
 							<th>apellido</th>
 							<th>email</th>
 							<th>fecha</th>
-							<th>crear factura</th>
-							<th>editar</th>
+							<th>Crear pedido</th>
 							<th>eliminar</th>
 						</tr>
 					</thead>
@@ -43,9 +42,7 @@
 							<td th:text="${cliente.createAt}"></td>
 							<td><a class="btn btn-success btn-xs"
 								th:href="@{'/factura/form/' + ${cliente.id}}"
-								th:text="'crear factura'"></a></td>
-							<td><a class="btn btn-primary btn-xs"
-								th:href="@{/form/} + ${cliente.id}" th:text="'editar'"></a></td>
+								th:text="'crear pedido'"></a></td>
 							<td><a class="btn btn-danger btn-xs"
 								th:href="@{/eliminar/} + ${cliente.id}" th:text="'eliminar'"
 								onclick="return confirm('Estas seguro que quieres eliminar?');"></a></td>

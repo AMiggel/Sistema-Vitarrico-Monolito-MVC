@@ -7,7 +7,7 @@ import org.springframework.data.domain.Pageable;
 
 import com.vitarrico.springboot.app.models.entity.Cliente;
 import com.vitarrico.springboot.app.models.entity.Factura;
-import com.vitarrico.springboot.app.models.entity.Producto;
+import com.vitarrico.springboot.app.models.entity.Lote;
 
 public interface IClienteService {
 
@@ -23,11 +23,11 @@ public interface IClienteService {
 	
 	public void delete(Long id);
 	
-	public List<Producto> findByNombre(String term);
+	public List<Lote> findByNombre(String term);
 	
 	public void saveFactura(Factura factura);
 	
-	public Producto findProductoById(Long id);
+	public Lote findProductoById(Long id);
 	
 	public Factura findFacturaById(Long id);
 	

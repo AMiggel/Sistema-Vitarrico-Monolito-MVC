@@ -10,10 +10,10 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.vitarrico.springboot.app.models.dao.IClienteDao;
 import com.vitarrico.springboot.app.models.dao.IFacturaDao;
-import com.vitarrico.springboot.app.models.dao.IProductoDao;
+import com.vitarrico.springboot.app.models.dao.ILoteDao;
 import com.vitarrico.springboot.app.models.entity.Cliente;
 import com.vitarrico.springboot.app.models.entity.Factura;
-import com.vitarrico.springboot.app.models.entity.Producto;
+import com.vitarrico.springboot.app.models.entity.Lote;
 
 @Service
 public class ClienteServiceImpl implements IClienteService{
@@ -22,7 +22,7 @@ public class ClienteServiceImpl implements IClienteService{
 	private IClienteDao clienteDao;
 	
 	@Autowired
-	private IProductoDao productoDao;
+	private ILoteDao productoDao;
 	
 	@Autowired
 	private IFacturaDao facturaDao;
@@ -31,7 +31,7 @@ public class ClienteServiceImpl implements IClienteService{
 	@Transactional(readOnly = true)
 	public List<Cliente> findAllByNombre() {
 		// TODO Auto-generated method stub
-		return (List<Cliente>) clienteDao.findAllByOrderByApellidoAsc();
+		return (List<Cliente>) clienteDao.findAllByOrderByCreateAtDesc();
 	}
 
 	@Override
@@ -66,7 +66,7 @@ public class ClienteServiceImpl implements IClienteService{
 
 	@Override
 	@Transactional(readOnly = true)
-	public List<Producto> findByNombre(String term) {
+	public List<Lote> findByNombre(String term) {
 		//return servicioProductoFeign.buscarProductoPorNombre(term);
 		return productoDao.findByNombreLikeIgnoreCase("%"+term+"%");
 	}
@@ -79,7 +79,7 @@ public class ClienteServiceImpl implements IClienteService{
 
 	@Override
 	@Transactional(readOnly=true)
-	public Producto findProductoById(Long id) {
+	public Lote findProductoById(Long id) {
 		return productoDao.findById(id).orElse(null);
 	}
 

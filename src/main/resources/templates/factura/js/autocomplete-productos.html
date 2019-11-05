@@ -2,6 +2,7 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <body>
 
+	
 	<script type="text/javascript" th:fragment="javascript">
 		$(document).ready(function() {
 
@@ -12,15 +13,22 @@
 						url : "/factura/cargar-productos/" + request.term,
 						dataType : "json",
 						data : {
-							term : request.term
+							term : request.term,
+		
 						},
 						success : function(data) {
-							response($.map(data, function(item) {
+							response($.map(data,function(item) {
+								var fechaActual = moment();
+							 	var fechaVencimiento = moment(item.fechaVencimiento);
+							 	var dias = fechaVencimiento.diff(fechaActual, 'days');
 								return {
+									//+" - disponibles :" + item.cantidadDisponible
 									value : item.id,
-									label : item.nombre,
+									label : item.nombre + " -------------------  vence en:  "  + dias + " dias" ,
+									nombre: item.nombre,
 									precio : item.precio,
-									cantidadDisponible: item.cantidadDisponible
+									cantidadDisponible: item.cantidadDisponible,
+									fechaVencimiento: item.fechaVencimiento
 									
 								};
 							}));
@@ -37,10 +45,18 @@
 					
 					var linea = $("#plantillaItemsFactura").html();
 					
+				
+						var fechaActual = moment();
+					 	var fechaVencimiento = moment(ui.item.fechaVencimiento);
+					 	var dias = fechaVencimiento.diff(fechaActual, 'days');
+				
+
+					
 					linea = linea.replace(/{ID}/g, ui.item.value);
-					linea = linea.replace(/{NOMBRE}/g, ui.item.label);
+					linea = linea.replace(/{NOMBRE}/g, ui.item.nombre);
 					linea = linea.replace(/{PRECIO}/g, ui.item.precio);
 					linea = linea.replace(/{CANTIDAD}/g, ui.item.cantidadDisponible);
+					linea = linea.replace(/{VENCIMIENTO}/g,dias);
 					$("#cargarItemProductos tbody").append(linea);
 					itemsHelper.calcularImporte(ui.item.value, ui.item.precio, 1);
 
@@ -54,6 +70,9 @@
 			});
 
 		});
+		
+
+		   
 		
 		var itemsHelper = {
 			calcularImporte: function(id, precio, cantidad){
