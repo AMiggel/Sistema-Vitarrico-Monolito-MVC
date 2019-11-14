@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="layout/layout :: head"></head>
+<body>
+
+	<header th:replace="layout/layout :: header"></header>
+
+	<div class="container py-4">
+
+		<div class="card bg-light">
+			<div class="card-header" th:text="${titulo}"></div>
+			<div class="card-body">
+
+				<div class="row">
+					<h4 class="card-title" style="margin-left:15px">
+						<a class="btn btn-primary btn-xs"
+							th:href="@{'/factura/form/' + ${cliente.id}}"
+							th:text="'crear pedido'"></a>
+					</h4>
+					<h4 class="card-title" style="margin-left:10px">
+						<a class="btn btn-primary btn-xs"
+							th:href="@{/form/} + ${cliente.id}" th:text="'editar'"></a>
+					</h4>
+				</div>
+				<ul class="list-group">
+					<li class="list-group-item"
+						th:text="${cliente.nombre} +' '+ ${cliente.apellido} "></li>
+					<li class="list-group-item" th:text="${cliente.email}"></li>
+					<!--<li class="list-group-item" th:text="${cliente.createAt}"></li>-->
+					<li class="list-group-item" th:text="${cliente.direccion}"></li>
+					<li class="list-group-item" th:text="${cliente.ciudad}"></li>
+				</ul>
+
+				<div th:if="${#lists.isEmpty(cliente.facturas)}"
+					class="alert alert-info my-4"
+					th:text="'No hay pedidos asignados para el cliente ' + ${cliente.nombre} + ' ' + ${cliente.apellido}"></div>
+
+				<table th:if="${not #lists.isEmpty(cliente.facturas)}"
+					class="table table-bordered table-striped my-4">
+					<thead class="thead-inverse">
+						<tr>
+							<th>Número</th>
+							<th>descripción</th>
+							<th>fecha</th>
+							<th>total</th>
+							<th>ver</th>
+							<th>eliminar</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr th:each="factura: ${cliente.facturas}">
+							<td th:text="${factura.id}"></td>
+							<td th:text="${factura.descripcion}"></td>
+							<td th:text="${factura.createAt}"></td>
+							<td th:text="${factura.total}"></td>
+							<td><a class="btn btn-primary btn-xs"
+								th:href="@{'/factura/ver/' + ${factura.id}}" th:text="'detalle'"></a></td>
+							<td><a class="btn btn-danger btn-xs"
+								th:href="@{'/factura/eliminar/' + ${factura.id}}"
+								th:text="'eliminar'"
+								onclick="return confirm('Estas seguro que desea eliminar este pedido?');"></a></td>
+						</tr>
+					</tbody>
+
+				</table>
+
+			</div>
+		</div>
+
+	</div>
+
+	<footer th:replace="layout/layout :: footer"></footer>
+</body>
+</html>
